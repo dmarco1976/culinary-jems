@@ -1,0 +1,30 @@
+---
+interface Props {
+  src: string;
+  poster: string;
+  alt: string;
+  class?: string;
+  eager?: boolean;
+}
+
+const { src, poster, alt, class: className = '', eager = false } = Astro.props;
+---
+
+<!-- Ambient video with image fallback -->
+<video
+  autoplay
+  loop
+  muted
+  playsinline
+  poster={poster}
+  class:list={['w-full h-full object-cover ambient-video', className]}
+  preload={eager ? 'auto' : 'metadata'}
+>
+  <source src={src} type="video/mp4" />
+</video>
+
+<script>
+  document.querySelectorAll<HTMLVideoElement>('video.ambient-video').forEach(v => {
+    v.playbackRate = 0.7;
+  });
+</script>

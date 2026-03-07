@@ -4,11 +4,12 @@ interface Props {
   description: string;
   protein: string;
   imageSrc?: string;
+  videoSrc?: string;
   price?: number;
   featured?: boolean;
 }
 
-const { name, description, protein, imageSrc, price, featured = false } = Astro.props;
+const { name, description, protein, imageSrc, videoSrc, price, featured = false } = Astro.props;
 
 const proteinColors: Record<string, string> = {
   Beef: 'bg-red-600 text-white',
@@ -27,12 +28,26 @@ const badgeClass = proteinColors[protein] || 'bg-gray-500 text-white';
   <!-- Image -->
   <div class="relative aspect-square overflow-hidden">
     {imageSrc ? (
-      <img
-        src={imageSrc}
-        alt={name}
-        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-        loading="lazy"
-      />
+      videoSrc ? (
+        <video
+          autoplay
+          loop
+          muted
+          playsinline
+          poster={imageSrc}
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ambient-video"
+          preload="metadata"
+        >
+          <source src={videoSrc} type="video/mp4" />
+        </video>
+      ) : (
+        <img
+          src={imageSrc}
+          alt={name}
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          loading="lazy"
+        />
+      )
     ) : (
       <div class="w-full h-full bg-gradient-to-br from-brand-gold/30 via-brand-pink/20 to-brand-dark/10 flex items-center justify-center">
         <span class="text-4xl opacity-50">&#127828;</span>

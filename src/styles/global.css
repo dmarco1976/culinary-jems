@@ -121,3 +121,10 @@
     animation: gentlePulse 2.5s ease-in-out infinite;
   }
 }
+
+/* Accessibility: pause ambient videos for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  video.ambient-video {
+    animation: none;
+  }
+}

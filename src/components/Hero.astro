@@ -1,4 +1,6 @@
 ---
+import VideoBackground from './VideoBackground.astro';
+
 // Hardcoded fallback event — will be replaced with dynamic data later
 const nextEvent = {
   name: 'Family Market at Radiance',
@@ -12,13 +14,14 @@ const nextEvent = {
 <section class="relative min-h-[80vh] md:min-h-[80vh] flex items-center bg-brand-dark overflow-hidden">
   <!-- Background Image with Overlay -->
   <div class="absolute inset-0">
-    <img
-      src="/assets/imported/hero.jpg"
+    <VideoBackground
+      src="/assets/videos/hero.mp4"
+      poster="/assets/imported/hero.jpg"
       alt="Culinary JEMs gourmet sliders"
-      class="w-full h-full object-cover scale-105"
-      loading="eager"
+      class="scale-[1.15]"
+      eager
     />
-    <div class="absolute inset-0 bg-gradient-to-r from-brand-dark/95 via-brand-dark/75 to-brand-dark/30"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-brand-dark/95 via-brand-dark/80 to-brand-dark/40"></div>
     <!-- Subtle radial glow behind the content -->
     <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_50%,rgba(255,197,89,0.08)_0%,transparent_60%)]"></div>
   </div>
