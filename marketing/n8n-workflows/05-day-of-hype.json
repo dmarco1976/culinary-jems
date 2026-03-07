@@ -1,0 +1,191 @@
+{
+  "name": "CulinaryJEMs — Day-of Hype",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Day-of Hype Post Generator\nEvery morning at 9 AM (MST), this checks if there's an event TODAY.\nIf yes:\n1. Asks OpenClaw for a high-energy 'TONIGHT!' or 'TODAY!' caption\n2. Renders a story-event graphic (1080x1920)\n3. Uploads to Drive and adds to calendar as 'approved' for 10 AM\n4. Notifies Discord\n\nThe hype post goes out automatically — no sister input needed!",
+        "width": 480,
+        "height": 220
+      },
+      "name": "Sticky Note - Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [100, 40],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      },
+      "name": "Daily 9 AM MST",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [300, 300],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "value": "={{$env.CONTENT_CALENDAR_SHEET_ID}}" },
+        "sheetName": { "value": "Content Calendar" },
+        "options": { "range": "A:M" }
+      },
+      "name": "Read Calendar",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [540, 300],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": { "name": "Google Sheets - CulinaryJEMs" }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const items = $input.all();\nconst today = new Date().toISOString().split('T')[0];\n\n// Find events happening today\nconst todayEvents = items.filter(item => {\n  const eventDate = item.json['Event Date'] || item.json['Scheduled Date'];\n  const pillar = item.json['Content Pillar'];\n  return eventDate === today && (pillar === 'Schedule' || pillar === 'Hype' || item.json['Venue']);\n});\n\n// Also check if we already have a hype post for today\nconst hasHypePost = items.some(item => {\n  return item.json['Scheduled Date'] === today && item.json['Content Pillar'] === 'Hype';\n});\n\nif (todayEvents.length === 0 || hasHypePost) {\n  return [{ json: { hasEvent: false, reason: hasHypePost ? 'Hype post already exists' : 'No events today' } }];\n}\n\nconst event = todayEvents[0].json;\nreturn [{\n  json: {\n    hasEvent: true,\n    venue: event['Venue'] || 'the event',\n    time: event['Scheduled Time'] || '5:00 - 9:00 PM',\n    date: today,\n    city: 'East Valley, AZ'\n  }\n}];"
+      },
+      "name": "Check for Today's Events",
+      "type": "n8n-nodes-base.code",
+      "position": [780, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.hasEvent }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "name": "Event Today?",
+      "type": "n8n-nodes-base.if",
+      "position": [1000, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "url": "={{$env.OPENCLAW_JEMS_URL}}/v1/chat/completions",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"default\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Day-of Hype task.\\n\\nVenue: {{ $json.venue }}\\nTime: {{ $json.time }}\\nCity: {{ $json.city }}\\n\\nRespond as JSON: {\\\"caption\\\": \\\"...\\\", \\\"hashtags\\\": \\\"...\\\", \\\"story_text\\\": \\\"...\\\", \\\"headline\\\": \\\"TONIGHT!\\\" or \\\"TODAY!\\\"}\"\n    }\n  ],\n  \"temperature\": 0.8,\n  \"max_tokens\": 300\n}",
+        "options": { "timeout": 30000 }
+      },
+      "name": "OpenClaw - Hype Caption",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1240, 240],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": { "name": "OpenClaw API Token" }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const item = $input.first();\nconst event = $('Check for Today\\'s Events').first().json;\n\nlet aiResponse;\ntry {\n  const content = item.json.choices[0].message.content;\n  const cleaned = content.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n  aiResponse = JSON.parse(cleaned);\n} catch (e) {\n  aiResponse = {\n    caption: `TONIGHT! 🔥 We're at ${event.venue}! Come grab gourmet sliders.`,\n    hashtags: '#CulinaryJEMs #GourmetSliders #AZFoodie #FoodTruckLife #ChefDriven',\n    story_text: `TONIGHT at ${event.venue}!`,\n    headline: 'TONIGHT!'\n  };\n}\n\nconst templateVars = JSON.stringify({\n  headline: aiResponse.headline || 'TONIGHT!',\n  venue: event.venue,\n  time: event.time,\n  address: event.city,\n  bgPhotoUrl: '../public/assets/imported/ig-sliders-brewery.jpg',\n  photo1: '../public/assets/imported/ig-sliders-rack.jpg',\n  photo2: '../public/assets/imported/ig-food-kitsune.jpg',\n  photo3: '../public/assets/imported/ig-goldwater.jpg'\n});\n\nreturn [{\n  json: {\n    caption: aiResponse.caption + '\\n\\n' + aiResponse.hashtags,\n    storyText: aiResponse.story_text,\n    headline: aiResponse.headline,\n    venue: event.venue,\n    time: event.time,\n    templateVars: templateVars,\n    outputFilename: `hype-${event.venue.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}-${Date.now()}.png`\n  }\n}];"
+      },
+      "name": "Build Hype Data",
+      "type": "n8n-nodes-base.code",
+      "position": [1480, 240],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "command": "=cd /path/to/culinary-jems/marketing && node render-template.js story-event '{{ $json.templateVars }}' ./output/{{ $json.outputFilename }}"
+      },
+      "name": "Render Story Graphic",
+      "type": "n8n-nodes-base.executeCommand",
+      "position": [1720, 240],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "value": "={{$env.CONTENT_CALENDAR_SHEET_ID}}" },
+        "sheetName": { "value": "Content Calendar" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post ID": "=POST-{{ Date.now().toString(36).toUpperCase() }}",
+            "Status": "approved",
+            "Scheduled Date": "={{ $('Check for Today\\'s Events').first().json.date }}",
+            "Scheduled Time": "10:00",
+            "Platform": "both",
+            "Content Pillar": "Hype",
+            "Caption": "={{ $('Build Hype Data').first().json.caption }}",
+            "Image URL": "",
+            "Venue": "={{ $('Check for Today\\'s Events').first().json.venue }}",
+            "Event Date": "={{ $('Check for Today\\'s Events').first().json.date }}",
+            "Created At": "={{ new Date().toISOString() }}",
+            "Posted At": "",
+            "Notes": "Auto-generated day-of hype post"
+          }
+        }
+      },
+      "name": "Add Approved to Calendar",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [1960, 240],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": { "name": "Google Sheets - CulinaryJEMs" }
+      }
+    },
+    {
+      "parameters": {
+        "webhookUri": "={{$env.DISCORD_WEBHOOK_NOTIFICATIONS}}",
+        "text": "=🔥 **Day-of hype post queued for 10 AM!**\n\n**{{ $('Check for Today\\'s Events').first().json.venue }}** — {{ $('Check for Today\\'s Events').first().json.time }}\n\n{{ $('Build Hype Data').first().json.caption.substring(0, 200) }}...\n\n🖼️ Story graphic generated!\n📱 Will auto-post at 10 AM (or check Discord for manual posting)."
+      },
+      "name": "Discord - Hype Queued",
+      "type": "n8n-nodes-base.discord",
+      "position": [2200, 240],
+      "typeVersion": 2
+    }
+  ],
+  "connections": {
+    "Daily 9 AM MST": {
+      "main": [[{ "node": "Read Calendar", "type": "main", "index": 0 }]]
+    },
+    "Read Calendar": {
+      "main": [[{ "node": "Check for Today's Events", "type": "main", "index": 0 }]]
+    },
+    "Check for Today's Events": {
+      "main": [[{ "node": "Event Today?", "type": "main", "index": 0 }]]
+    },
+    "Event Today?": {
+      "main": [
+        [{ "node": "OpenClaw - Hype Caption", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "OpenClaw - Hype Caption": {
+      "main": [[{ "node": "Build Hype Data", "type": "main", "index": 0 }]]
+    },
+    "Build Hype Data": {
+      "main": [[{ "node": "Render Story Graphic", "type": "main", "index": 0 }]]
+    },
+    "Render Story Graphic": {
+      "main": [[{ "node": "Add Approved to Calendar", "type": "main", "index": 0 }]]
+    },
+    "Add Approved to Calendar": {
+      "main": [[{ "node": "Discord - Hype Queued", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "timezone": "America/Phoenix"
+  },
+  "tags": [{ "name": "culinary-jems" }, { "name": "marketing" }]
+}

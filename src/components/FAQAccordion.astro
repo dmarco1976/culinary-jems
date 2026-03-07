@@ -1,0 +1,74 @@
+---
+interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+interface Props {
+  items: FAQItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<div class="max-w-3xl mx-auto space-y-3">
+  {items.map((item, index) => (
+    <div class="faq-item bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden" data-index={index}>
+      <button
+        class="faq-toggle w-full flex items-center justify-between py-5 px-6 text-left group"
+        aria-expanded="false"
+      >
+        <span class="font-semibold text-brand-dark text-[0.95rem] md:text-lg pr-4 group-hover:text-brand-pink transition-colors">
+          {item.question}
+        </span>
+        <span class="faq-icon flex-shrink-0 w-8 h-8 rounded-full bg-brand-gold/10 group-hover:bg-brand-gold/20 flex items-center justify-center text-brand-gold transition-all duration-300">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12M6 12h12" />
+          </svg>
+        </span>
+      </button>
+      <div class="faq-answer overflow-hidden max-h-0 transition-all duration-300 ease-in-out">
+        <div class="px-6 pb-5 border-l-3 border-brand-gold ml-6" style="border-left: 3px solid #FFC559;">
+          <p class="text-gray-600 leading-relaxed">
+            {item.answer}
+          </p>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
+<script>
+  const faqToggles = document.querySelectorAll<HTMLButtonElement>('.faq-toggle');
+
+  faqToggles.forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      const item = toggle.closest('.faq-item') as HTMLElement;
+      const answer = item.querySelector('.faq-answer') as HTMLElement;
+      const icon = item.querySelector('.faq-icon') as HTMLElement;
+      const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+
+      if (isOpen) {
+        // Close
+        answer.style.maxHeight = '0px';
+        toggle.setAttribute('aria-expanded', 'false');
+        icon.classList.remove('rotate-45');
+      } else {
+        // Close all others first
+        document.querySelectorAll('.faq-item').forEach((otherItem) => {
+          const otherAnswer = otherItem.querySelector('.faq-answer') as HTMLElement;
+          const otherToggle = otherItem.querySelector('.faq-toggle') as HTMLButtonElement;
+          const otherIcon = otherItem.querySelector('.faq-icon') as HTMLElement;
+          otherAnswer.style.maxHeight = '0px';
+          otherToggle.setAttribute('aria-expanded', 'false');
+          otherIcon.classList.remove('rotate-45');
+        });
+
+        // Open this one
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+        toggle.setAttribute('aria-expanded', 'true');
+        icon.classList.add('rotate-45');
+      }
+    });
+  });
+</script>

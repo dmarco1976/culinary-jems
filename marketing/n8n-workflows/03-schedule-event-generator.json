@@ -1,0 +1,195 @@
+{
+  "name": "CulinaryJEMs — Schedule Event Post Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Schedule Event Post Generator\nWhen a new event is added (via webhook from Sanity CMS or manually via Discord), this workflow:\n1. Sends event details to OpenClaw AI to write a schedule announcement caption\n2. Renders a branded 'schedule-card' graphic using Puppeteer\n3. Uploads the graphic to Google Drive\n4. Adds a draft row to the Content Calendar\n5. Sends a preview to Discord\n\nTwo entry points: Sanity webhook (automatic) or manual webhook (Discord command).",
+        "width": 520,
+        "height": 220
+      },
+      "name": "Sticky Note - Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [100, 40],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "path": "culinaryjems-schedule",
+        "httpMethod": "POST",
+        "responseMode": "onReceived",
+        "responseData": "firstEntryJson",
+        "options": {}
+      },
+      "name": "Schedule Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [300, 300],
+      "typeVersion": 2,
+      "webhookId": "culinaryjems-schedule"
+    },
+    {
+      "parameters": {
+        "content": "## Receives event details\nTriggered when a new event is added in Sanity CMS or when someone sends event details via Discord. Expects: venue, date, time, address, city.",
+        "width": 280,
+        "height": 100
+      },
+      "name": "Sticky Note - Trigger",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [260, 180],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            { "name": "venue", "value": "={{ $json.body?.venue || $json.venue || 'TBD' }}", "type": "string" },
+            { "name": "date", "value": "={{ $json.body?.date || $json.date || '' }}", "type": "string" },
+            { "name": "time", "value": "={{ $json.body?.time || $json.time || '' }}", "type": "string" },
+            { "name": "address", "value": "={{ $json.body?.address || $json.address || '' }}", "type": "string" },
+            { "name": "city", "value": "={{ $json.body?.city || $json.city || 'Gilbert, AZ' }}", "type": "string" }
+          ]
+        }
+      },
+      "name": "Normalize Event Data",
+      "type": "n8n-nodes-base.set",
+      "position": [540, 300],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "url": "={{$env.OPENCLAW_JEMS_URL}}/v1/chat/completions",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"default\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Schedule Announcement task.\\n\\nVenue: {{ $json.venue }}\\nDate: {{ $json.date }}\\nTime: {{ $json.time }}\\nAddress: {{ $json.address }}, {{ $json.city }}\\n\\nRespond as JSON: {\\\"caption\\\": \\\"...\\\", \\\"hashtags\\\": \\\"...\\\"}\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"max_tokens\": 400\n}",
+        "options": { "timeout": 30000 }
+      },
+      "name": "OpenClaw - Schedule Caption",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [780, 300],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": { "name": "OpenClaw API Token" }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const items = $input.all();\nconst event = $('Normalize Event Data').first().json;\nconst results = [];\n\nfor (const item of items) {\n  let aiResponse;\n  try {\n    const content = item.json.choices[0].message.content;\n    const cleaned = content.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n    aiResponse = JSON.parse(cleaned);\n  } catch (e) {\n    aiResponse = {\n      caption: `We're heading to ${event.venue}! Come grab some gourmet sliders.`,\n      hashtags: '#CulinaryJEMs #GourmetSliders #AZFoodie'\n    };\n  }\n\n  // Build variables JSON for Puppeteer template rendering\n  const templateVars = JSON.stringify({\n    venue: event.venue,\n    date: event.date,\n    time: event.time,\n    address: event.address,\n    city: event.city\n  });\n\n  results.push({\n    json: {\n      caption: aiResponse.caption + '\\n\\n' + aiResponse.hashtags,\n      venue: event.venue,\n      date: event.date,\n      time: event.time,\n      address: event.address,\n      city: event.city,\n      templateVars: templateVars,\n      outputFilename: `schedule-${event.venue.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}-${Date.now()}.png`\n    }\n  });\n}\n\nreturn results;"
+      },
+      "name": "Build Template Data",
+      "type": "n8n-nodes-base.code",
+      "position": [1020, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "command": "=cd /path/to/culinary-jems/marketing && node render-template.js schedule-card '{{ $json.templateVars }}' ./output/{{ $json.outputFilename }}"
+      },
+      "name": "Render Schedule Card",
+      "type": "n8n-nodes-base.executeCommand",
+      "position": [1260, 300],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Renders branded graphic\nRuns Puppeteer to create a beautiful 1080x1080 schedule card with the venue, date, time, and brand colors. Replaces Canva!",
+        "width": 280,
+        "height": 100
+      },
+      "name": "Sticky Note - Render",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [1220, 180],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "folderId": { "value": "={{$env.GDRIVE_GRAPHICS_FOLDER_ID}}" },
+        "fileName": "={{ $json.outputFilename }}",
+        "binaryPropertyName": "data"
+      },
+      "name": "Upload to Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [1500, 300],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": { "name": "Google Drive - CulinaryJEMs" }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "value": "={{$env.CONTENT_CALENDAR_SHEET_ID}}" },
+        "sheetName": { "value": "Content Calendar" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post ID": "=POST-{{ Date.now().toString(36).toUpperCase() }}",
+            "Status": "draft",
+            "Scheduled Date": "={{ $('Normalize Event Data').first().json.date }}",
+            "Scheduled Time": "10:00",
+            "Platform": "both",
+            "Content Pillar": "Schedule",
+            "Caption": "={{ $('Build Template Data').first().json.caption }}",
+            "Image URL": "={{ $json.webViewLink || '' }}",
+            "Venue": "={{ $('Normalize Event Data').first().json.venue }}",
+            "Event Date": "={{ $('Normalize Event Data').first().json.date }}",
+            "Created At": "={{ new Date().toISOString() }}",
+            "Posted At": "",
+            "Notes": "Auto-generated schedule post with branded graphic"
+          }
+        }
+      },
+      "name": "Add to Calendar",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [1740, 300],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": { "name": "Google Sheets - CulinaryJEMs" }
+      }
+    },
+    {
+      "parameters": {
+        "webhookUri": "={{$env.DISCORD_WEBHOOK_CONTENT_QUEUE}}",
+        "text": "=📍 **New schedule post ready!**\n\n**{{ $('Normalize Event Data').first().json.venue }}**\n📅 {{ $('Normalize Event Data').first().json.date }}\n🕐 {{ $('Normalize Event Data').first().json.time }}\n📌 {{ $('Normalize Event Data').first().json.address }}\n\n{{ $('Build Template Data').first().json.caption.substring(0, 200) }}...\n\n🖼️ Branded graphic generated and attached!\n✅ Review in the Content Calendar and set to 'approved' when ready."
+      },
+      "name": "Discord - Preview",
+      "type": "n8n-nodes-base.discord",
+      "position": [1980, 300],
+      "typeVersion": 2
+    }
+  ],
+  "connections": {
+    "Schedule Webhook": {
+      "main": [[{ "node": "Normalize Event Data", "type": "main", "index": 0 }]]
+    },
+    "Normalize Event Data": {
+      "main": [[{ "node": "OpenClaw - Schedule Caption", "type": "main", "index": 0 }]]
+    },
+    "OpenClaw - Schedule Caption": {
+      "main": [[{ "node": "Build Template Data", "type": "main", "index": 0 }]]
+    },
+    "Build Template Data": {
+      "main": [[{ "node": "Render Schedule Card", "type": "main", "index": 0 }]]
+    },
+    "Render Schedule Card": {
+      "main": [[{ "node": "Upload to Google Drive", "type": "main", "index": 0 }]]
+    },
+    "Upload to Google Drive": {
+      "main": [[{ "node": "Add to Calendar", "type": "main", "index": 0 }]]
+    },
+    "Add to Calendar": {
+      "main": [[{ "node": "Discord - Preview", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "timezone": "America/Phoenix"
+  },
+  "tags": [{ "name": "culinary-jems" }, { "name": "marketing" }]
+}

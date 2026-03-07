@@ -1,0 +1,81 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import ScheduleEmbed from '../components/ScheduleEmbed.astro';
+---
+
+<PageLayout
+  title="Schedule | Culinary JEMs — Find Our Food Truck"
+  description="Find Culinary JEMs gourmet slider food truck this week. Pop-ups at breweries, markets, and events across Gilbert, Mesa, and the East Valley, AZ."
+>
+  <!-- Header -->
+  <section class="bg-brand-dark text-white py-16 px-4">
+    <div class="max-w-4xl mx-auto text-center">
+      <h1 class="heading-lg mb-4">Find Us This Week</h1>
+      <p class="text-xl text-gray-300">
+        We pop up at breweries, markets, and community events across the East Valley
+      </p>
+    </div>
+  </section>
+
+  <!-- Upcoming Events -->
+  <section class="section-padding">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="heading-md mb-8 text-center">Upcoming Pop-Ups</h2>
+
+      <!-- Hardcoded events for now — will be replaced by Sanity/StreetFoodFinder data -->
+      <div class="space-y-4 mb-12">
+        <div class="border border-gray-200 rounded-lg p-6 hover:border-brand-gold transition-colors">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="bg-brand-gold text-brand-dark text-xs font-bold px-2 py-1 rounded">UPCOMING</span>
+                <span class="text-sm text-gray-500">Saturday, March 7, 2026</span>
+              </div>
+              <h3 class="text-xl font-bold">Family Market at Radiance</h3>
+              <p class="text-gray-600">Mesa, AZ · 4:00 PM – 7:00 PM</p>
+            </div>
+            <a
+              href="https://www.google.com/maps/search/Radiance+Mesa+AZ"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-primary text-sm whitespace-nowrap"
+            >
+              Get Directions →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- StreetFoodFinder Embed -->
+      <ScheduleEmbed />
+    </div>
+  </section>
+
+  <!-- Past Events Social Proof -->
+  <section class="bg-brand-light py-16 px-4">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="heading-md mb-4">Where We've Been</h2>
+      <p class="text-gray-600 mb-8">
+        We pop up at 3-5 locations per week across the East Valley. Here are some of our regular spots:
+      </p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {['Local Breweries', 'Farmers Markets', 'Community Events', 'Private Venues'].map((spot) => (
+          <div class="bg-white rounded-lg p-4 shadow-sm">
+            <p class="font-semibold text-brand-dark">{spot}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Catering CTA -->
+  <section class="bg-brand-gold py-16 px-4">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="heading-md text-brand-dark mb-4">Want Us at YOUR Event?</h2>
+      <p class="text-brand-dark/80 mb-6">
+        We cater corporate lunches, private parties, weddings, brewery events, and more.
+      </p>
+      <a href="/catering" class="btn-secondary">Get a Free Catering Quote →</a>
+    </div>
+  </section>
+</PageLayout>

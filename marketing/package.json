@@ -1,0 +1,18 @@
+{
+  "name": "culinary-jems-marketing",
+  "version": "1.0.0",
+  "description": "Culinary JEMs marketing automation — template rendering and content generation",
+  "private": true,
+  "scripts": {
+    "render": "node render-template.js",
+    "test:schedule": "node render-template.js schedule-card '{\"venue\":\"SanTan Brewing Co.\",\"date\":\"Friday, March 7\",\"time\":\"5:00 - 9:00 PM\",\"address\":\"8 S San Marcos Pl\",\"city\":\"Chandler, AZ\"}' ./output/test-schedule.png",
+    "test:spotlight": "node render-template.js menu-spotlight '{\"name\":\"The Fat Sam\",\"protein\":\"Beef\",\"description\":\"Four Peaks Kilt Lifter braised beef, tobacco onions, roasted garlic aioli\",\"photoUrl\":\"../public/assets/imported/ig-goldwater.jpg\"}' ./output/test-spotlight.png",
+    "test:story": "node render-template.js story-event '{\"headline\":\"TONIGHT!\",\"venue\":\"Goldwater Brewing\",\"time\":\"5:00 - 9:00 PM\",\"address\":\"3608 E Indian School Rd, Phoenix\",\"bgPhotoUrl\":\"../public/assets/imported/ig-sliders-brewery.jpg\",\"photo1\":\"../public/assets/imported/ig-sliders-rack.jpg\",\"photo2\":\"../public/assets/imported/ig-food-kitsune.jpg\",\"photo3\":\"../public/assets/imported/ig-goldwater.jpg\"}' ./output/test-story.png",
+    "test:recap": "node render-template.js event-recap '{\"venue\":\"SanTan Brewing\",\"date\":\"March 1, 2026\",\"photo1\":\"../public/assets/imported/ig-sliders-rack.jpg\",\"photo2\":\"../public/assets/imported/ig-food-kitsune.jpg\",\"photo3\":\"../public/assets/imported/ig-goldwater.jpg\",\"photo4\":\"../public/assets/imported/ig-sliders-brewery.jpg\"}' ./output/test-recap.png",
+    "test:catering": "node render-template.js catering-promo '{\"photoUrl\":\"../public/assets/imported/ig-sliders-brewery.jpg\"}' ./output/test-catering.png",
+    "test:all": "npm run test:schedule && npm run test:spotlight && npm run test:story && npm run test:recap && npm run test:catering"
+  },
+  "dependencies": {
+    "puppeteer": "^22.0.0"
+  }
+}

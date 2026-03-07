@@ -1,0 +1,38 @@
+---
+// Hardcoded fallback event data — will be replaced with dynamic data later
+const event = {
+  name: 'Family Market at Radiance',
+  date: 'Sat 3/7',
+  time: '4-7pm',
+  city: 'Mesa',
+  directionsUrl: 'https://www.google.com/maps/search/?api=1&query=Radiance+Mesa+AZ',
+};
+
+const hasEvent = !!event;
+---
+
+{hasEvent && (
+  <div class="w-full bg-brand-gold text-brand-dark py-2 text-sm font-semibold text-center z-50 relative">
+    <div class="max-w-7xl mx-auto px-4 flex items-center justify-center gap-1 flex-wrap">
+      <span class="hidden sm:inline">&#x1F525;</span>
+      <span class="whitespace-nowrap">NEXT:</span>
+      <span class="truncate max-w-[200px] sm:max-w-none">{event.name}</span>
+      <span class="hidden sm:inline">&middot;</span>
+      <span class="whitespace-nowrap">{event.date}</span>
+      <span>&middot;</span>
+      <span class="whitespace-nowrap">{event.time}</span>
+      <span>&middot;</span>
+      <span>{event.city}</span>
+      <a
+        href={event.directionsUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="ml-2 underline hover:no-underline whitespace-nowrap"
+      >
+        Get Directions &rarr;
+      </a>
+    </div>
+  </div>
+)}
+
+<!-- If no event, the banner simply does not render -->

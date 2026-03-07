@@ -1,0 +1,63 @@
+---
+const testimonials = [
+  {
+    quote: "Best sliders I've ever had! The Fat Sam is incredible.",
+    source: 'Yelp Review',
+    stars: 5,
+  },
+  {
+    quote: "They catered our company lunch and everyone raved about the food.",
+    source: 'Google Review',
+    stars: 5,
+  },
+  {
+    quote: "Chef Brian's attention to quality really shows. Grass-fed beef makes the difference.",
+    source: 'Yelp Review',
+    stars: 5,
+  },
+];
+---
+
+<section class="relative bg-brand-gold py-16 md:py-20 overflow-hidden grain-overlay">
+  <!-- Decorative oversized quote marks in background -->
+  <div class="absolute top-4 left-8 text-brand-dark/[0.06] text-[12rem] md:text-[16rem] font-serif leading-none select-none pointer-events-none" aria-hidden="true">&ldquo;</div>
+  <div class="absolute bottom-0 right-8 text-brand-dark/[0.06] text-[12rem] md:text-[16rem] font-serif leading-none select-none pointer-events-none" aria-hidden="true">&rdquo;</div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-4 md:px-8 lg:px-16">
+    <!-- Heading + Yelp Badge -->
+    <div class="text-center mb-12">
+      <h2 class="heading-md text-brand-dark mb-4">Loved by the East Valley</h2>
+      <div class="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full px-5 py-2 shadow-sm">
+        <span class="text-red-600 font-bold text-lg">&#9733;</span>
+        <span class="font-bold text-brand-dark">4.0</span>
+        <span class="text-gray-600 text-sm">&middot; 241 reviews on Yelp</span>
+      </div>
+    </div>
+
+    <!-- Testimonials Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {testimonials.map((t) => (
+        <div class="relative bg-white rounded-2xl p-6 md:p-7 shadow-md hover:shadow-xl transition-shadow duration-300 group">
+          <!-- Gold accent bar at top -->
+          <div class="absolute top-0 left-6 right-6 h-1 bg-brand-dark/10 rounded-b-full group-hover:bg-brand-pink transition-colors duration-300"></div>
+
+          <!-- Stars -->
+          <div class="flex gap-0.5 mb-3 mt-1">
+            {Array.from({ length: t.stars }).map(() => (
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-brand-gold" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+            ))}
+          </div>
+
+          <p class="text-brand-dark leading-relaxed mb-4 text-[0.95rem]">
+            &ldquo;{t.quote}&rdquo;
+          </p>
+          <p class="text-sm font-semibold text-gray-500">
+            &mdash; {t.source}
+          </p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

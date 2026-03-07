@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Manrope', system-ui, sans-serif;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply text-brand-dark bg-white;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-brand-gold text-brand-dark font-bold px-6 py-3 hover:bg-brand-gold-dark transition-all duration-200 inline-block text-center;
+  }
+  .btn-secondary {
+    @apply bg-brand-dark text-white font-bold px-6 py-3 rounded-full hover:bg-gray-800 transition-all duration-200 inline-block text-center;
+  }
+  .btn-pink {
+    @apply bg-brand-pink text-white font-bold px-6 py-3 hover:bg-brand-pink-dark transition-all duration-200 inline-block text-center;
+  }
+  .section-padding {
+    @apply px-4 py-16 md:px-8 lg:px-16 max-w-7xl mx-auto;
+  }
+  .heading-lg {
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold;
+  }
+  .heading-md {
+    @apply text-2xl md:text-3xl font-bold;
+  }
+  .heading-sm {
+    @apply text-xl md:text-2xl font-bold;
+  }
+}
+
+@layer utilities {
+  /* Noise/grain overlay for textured sections */
+  .grain-overlay {
+    position: relative;
+  }
+  .grain-overlay::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Angled section dividers */
+  .angle-top {
+    clip-path: polygon(0 4vw, 100% 0, 100% 100%, 0 100%);
+    margin-top: -4vw;
+    padding-top: calc(4vw + 4rem);
+  }
+  .angle-bottom {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 4vw), 0 100%);
+    padding-bottom: calc(4vw + 4rem);
+  }
+
+  /* Floating animation for hero elements */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
+  }
+
+  /* Stagger entry animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+  }
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+  .stagger-4 { animation-delay: 0.4s; }
+  .stagger-5 { animation-delay: 0.5s; }
+
+  /* Gold shimmer for CTAs */
+  @keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  .btn-shimmer {
+    background-size: 200% auto;
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255,255,255,0.2) 50%,
+      transparent 100%
+    );
+    animation: shimmer 3s linear infinite;
+  }
+
+  /* Subtle pulse for the "Book Us" CTA */
+  @keyframes gentlePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(240, 0, 117, 0.3); }
+    50% { box-shadow: 0 0 0 8px rgba(240, 0, 117, 0); }
+  }
+  .pulse-pink {
+    animation: gentlePulse 2.5s ease-in-out infinite;
+  }
+}

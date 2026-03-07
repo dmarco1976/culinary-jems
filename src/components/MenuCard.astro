@@ -1,0 +1,66 @@
+---
+interface Props {
+  name: string;
+  description: string;
+  protein: string;
+  imageSrc?: string;
+  price?: number;
+  featured?: boolean;
+}
+
+const { name, description, protein, imageSrc, price, featured = false } = Astro.props;
+
+const proteinColors: Record<string, string> = {
+  Beef: 'bg-red-600 text-white',
+  Pork: 'bg-amber-600 text-white',
+  Chicken: 'bg-yellow-500 text-brand-dark',
+  Turkey: 'bg-green-600 text-white',
+};
+
+const badgeClass = proteinColors[protein] || 'bg-gray-500 text-white';
+---
+
+<div
+  class="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+  data-protein={protein}
+>
+  <!-- Image -->
+  <div class="relative aspect-square overflow-hidden">
+    {imageSrc ? (
+      <img
+        src={imageSrc}
+        alt={name}
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+        loading="lazy"
+      />
+    ) : (
+      <div class="w-full h-full bg-gradient-to-br from-brand-gold/30 via-brand-pink/20 to-brand-dark/10 flex items-center justify-center">
+        <span class="text-4xl opacity-50">&#127828;</span>
+      </div>
+    )}
+
+    {/* Featured Badge */}
+    {featured && (
+      <div class="absolute top-3 left-3 bg-brand-gold text-brand-dark text-xs font-extrabold uppercase px-2.5 py-1 rounded-full flex items-center gap-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+        </svg>
+        Featured
+      </div>
+    )}
+
+    {/* Protein Badge */}
+    <div class={`absolute top-3 right-3 text-xs font-bold px-2.5 py-1 rounded-full ${badgeClass}`}>
+      {protein}
+    </div>
+  </div>
+
+  <!-- Card Body -->
+  <div class="p-4">
+    <h3 class="font-bold text-brand-dark text-lg mb-1">{name}</h3>
+    <p class="text-sm text-gray-600 leading-relaxed">{description}</p>
+    {price !== undefined && (
+      <p class="mt-2 text-brand-pink font-bold">${price.toFixed(2)}</p>
+    )}
+  </div>
+</div>

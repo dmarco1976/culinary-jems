@@ -1,0 +1,64 @@
+---
+const steps = [
+  {
+    number: 1,
+    icon: 'clipboard',
+    title: 'Tell Us About Your Event',
+    description: 'Share your date, headcount, and vision',
+  },
+  {
+    number: 2,
+    icon: 'chat',
+    title: 'Get a Custom Quote',
+    description: "We'll build a menu that fits your event",
+  },
+  {
+    number: 3,
+    icon: 'truck',
+    title: 'We Show Up, You Enjoy',
+    description: 'We handle everything — you enjoy the party',
+  },
+];
+---
+
+<div class="relative max-w-5xl mx-auto">
+  <!-- Connecting line (desktop only) — dashed gold line -->
+  <div class="hidden md:block absolute top-12 left-[20%] right-[20%] border-t-2 border-dashed border-brand-gold/40"></div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-6">
+    {steps.map((step, i) => (
+      <div class="flex flex-col items-center text-center relative group">
+        <!-- Number circle with ring animation on hover -->
+        <div class="relative z-10 mb-6">
+          <div class="absolute inset-0 rounded-full bg-brand-gold/20 scale-100 group-hover:scale-125 transition-transform duration-500"></div>
+          <div class="relative w-16 h-16 rounded-full bg-brand-gold text-brand-dark flex items-center justify-center text-2xl font-extrabold shadow-lg ring-4 ring-brand-gold/20">
+            {step.number}
+          </div>
+        </div>
+
+        <!-- Icon -->
+        <div class="text-brand-dark mb-3 group-hover:text-brand-pink transition-colors duration-300">
+          {step.icon === 'clipboard' && (
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-9 h-9 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            </svg>
+          )}
+          {step.icon === 'chat' && (
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-9 h-9 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+          )}
+          {step.icon === 'truck' && (
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-9 h-9 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+            </svg>
+          )}
+        </div>
+
+        <!-- Text -->
+        <h3 class="font-bold text-brand-dark text-lg mb-2">{step.title}</h3>
+        <p class="text-gray-600 text-sm max-w-xs leading-relaxed">{step.description}</p>
+      </div>
+    ))}
+  </div>
+</div>

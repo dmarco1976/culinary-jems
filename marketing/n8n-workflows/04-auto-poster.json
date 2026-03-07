@@ -1,0 +1,259 @@
+{
+  "name": "CulinaryJEMs — Auto-Poster",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Auto-Poster\nRuns every 30 minutes and checks the Content Calendar for posts that are:\n- Status = 'approved'\n- Scheduled time has passed (due now)\n\nWhen it finds one, it posts to Facebook and/or Instagram via the Meta Graph API, then updates the sheet to 'posted' and notifies Discord.\n\n⚠️ While waiting for Meta API approval, this falls back to sending the ready-to-post content to Discord for manual posting.",
+        "width": 540,
+        "height": 220
+      },
+      "name": "Sticky Note - Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [100, 40],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            { "field": "minutes", "minutesInterval": 30 }
+          ]
+        }
+      },
+      "name": "Every 30 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [300, 300],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "value": "={{$env.CONTENT_CALENDAR_SHEET_ID}}" },
+        "sheetName": { "value": "Content Calendar" },
+        "options": { "range": "A:M" }
+      },
+      "name": "Read Calendar",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [540, 300],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": { "name": "Google Sheets - CulinaryJEMs" }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const items = $input.all();\nconst now = new Date();\nconst nowStr = now.toISOString().split('T')[0];\nconst nowTime = now.toTimeString().substring(0, 5);\n\nconst duePosts = [];\n\nfor (const item of items) {\n  const status = item.json['Status'];\n  const date = item.json['Scheduled Date'];\n  const time = item.json['Scheduled Time'] || '10:00';\n\n  if (status === 'approved' && date && date <= nowStr) {\n    // If same day, check time. If past day, always post.\n    if (date < nowStr || time <= nowTime) {\n      duePosts.push({ json: item.json });\n    }\n  }\n}\n\nif (duePosts.length === 0) {\n  return [{ json: { noPosts: true } }];\n}\n\nreturn duePosts;"
+      },
+      "name": "Filter Due Posts",
+      "type": "n8n-nodes-base.code",
+      "position": [780, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.noPosts }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "notEqual" }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "name": "Has Due Posts?",
+      "type": "n8n-nodes-base.if",
+      "position": [1000, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "## Check if Meta API is configured\nIf the Facebook Page Access Token is set, post directly to FB/IG.\nOtherwise, fall back to Discord notification for manual posting.",
+        "width": 300,
+        "height": 100
+      },
+      "name": "Sticky Note - Platform Check",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [1180, 120],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json['Platform'] }}",
+        "rules": {
+          "rules": [
+            { "operation": "equal", "value2": "facebook" },
+            { "operation": "equal", "value2": "instagram" },
+            { "operation": "equal", "value2": "both" }
+          ]
+        },
+        "fallbackOutput": 3
+      },
+      "name": "Route by Platform",
+      "type": "n8n-nodes-base.switch",
+      "position": [1240, 240],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v19.0/{{$env.FB_PAGE_ID}}/feed",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": \"{{ $json['Caption'] }}\",\n  \"access_token\": \"{{$env.FB_PAGE_ACCESS_TOKEN}}\"\n}",
+        "options": {
+          "timeout": 15000,
+          "fullResponse": true
+        }
+      },
+      "name": "Post to Facebook",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1500, 140],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v19.0/{{$env.IG_BUSINESS_ACCOUNT_ID}}/media",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"image_url\": \"{{ $json['Image URL'] }}\",\n  \"caption\": \"{{ $json['Caption'] }}\",\n  \"access_token\": \"{{$env.FB_PAGE_ACCESS_TOKEN}}\"\n}",
+        "options": { "timeout": 15000, "fullResponse": true }
+      },
+      "name": "IG - Create Media Container",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1500, 300],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v19.0/{{$env.IG_BUSINESS_ACCOUNT_ID}}/media_publish",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"creation_id\": \"{{ $json.id }}\",\n  \"access_token\": \"{{$env.FB_PAGE_ACCESS_TOKEN}}\"\n}",
+        "options": { "timeout": 15000 }
+      },
+      "name": "IG - Publish",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1740, 300],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// For 'both' platform — post to FB first, then IG\nconst item = $input.first();\nreturn [{ json: { ...item.json, _postBoth: true } }];"
+      },
+      "name": "Post to Both",
+      "type": "n8n-nodes-base.code",
+      "position": [1500, 460],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "value": "={{$env.CONTENT_CALENDAR_SHEET_ID}}" },
+        "sheetName": { "value": "Content Calendar" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post ID": "={{ $json['Post ID'] }}",
+            "Status": "posted",
+            "Posted At": "={{ new Date().toISOString() }}"
+          }
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "name": "Update Sheet - Posted",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [2000, 300],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": { "name": "Google Sheets - CulinaryJEMs" }
+      }
+    },
+    {
+      "parameters": {
+        "webhookUri": "={{$env.DISCORD_WEBHOOK_NOTIFICATIONS}}",
+        "text": "=✅ **Posted!**\n\n{{ $json['Content Pillar'] }} → {{ $json['Platform'] }}\n{{ $json['Caption'].substring(0, 150) }}...\n\n📅 {{ $json['Scheduled Date'] }}"
+      },
+      "name": "Discord - Posted Notification",
+      "type": "n8n-nodes-base.discord",
+      "position": [2240, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "## Fallback: Discord Notification (No Meta API Yet)\nWhile waiting for Meta API approval, send the ready-to-post content to Discord so the sister can copy & paste to post manually.",
+        "width": 340,
+        "height": 100
+      },
+      "name": "Sticky Note - Fallback",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [1440, 560],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "webhookUri": "={{$env.DISCORD_WEBHOOK_NOTIFICATIONS}}",
+        "text": "=📱 **Ready to post!** (Manual mode — Meta API pending)\n\n**Platform:** {{ $json['Platform'] }}\n**Pillar:** {{ $json['Content Pillar'] }}\n\n📝 **Caption:**\n{{ $json['Caption'] }}\n\n🖼️ **Image:** {{ $json['Image URL'] || 'No image attached' }}\n\n➡️ Copy the caption above and post to {{ $json['Platform'] }} now!"
+      },
+      "name": "Discord - Manual Post Fallback",
+      "type": "n8n-nodes-base.discord",
+      "position": [1500, 660],
+      "typeVersion": 2
+    }
+  ],
+  "connections": {
+    "Every 30 Minutes": {
+      "main": [[{ "node": "Read Calendar", "type": "main", "index": 0 }]]
+    },
+    "Read Calendar": {
+      "main": [[{ "node": "Filter Due Posts", "type": "main", "index": 0 }]]
+    },
+    "Filter Due Posts": {
+      "main": [[{ "node": "Has Due Posts?", "type": "main", "index": 0 }]]
+    },
+    "Has Due Posts?": {
+      "main": [
+        [{ "node": "Route by Platform", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "Route by Platform": {
+      "main": [
+        [{ "node": "Post to Facebook", "type": "main", "index": 0 }],
+        [{ "node": "IG - Create Media Container", "type": "main", "index": 0 }],
+        [{ "node": "Post to Both", "type": "main", "index": 0 }],
+        [{ "node": "Discord - Manual Post Fallback", "type": "main", "index": 0 }]
+      ]
+    },
+    "Post to Facebook": {
+      "main": [[{ "node": "Update Sheet - Posted", "type": "main", "index": 0 }]]
+    },
+    "IG - Create Media Container": {
+      "main": [[{ "node": "IG - Publish", "type": "main", "index": 0 }]]
+    },
+    "IG - Publish": {
+      "main": [[{ "node": "Update Sheet - Posted", "type": "main", "index": 0 }]]
+    },
+    "Post to Both": {
+      "main": [[{ "node": "Post to Facebook", "type": "main", "index": 0 }]]
+    },
+    "Update Sheet - Posted": {
+      "main": [[{ "node": "Discord - Posted Notification", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "timezone": "America/Phoenix"
+  },
+  "tags": [{ "name": "culinary-jems" }, { "name": "marketing" }]
+}

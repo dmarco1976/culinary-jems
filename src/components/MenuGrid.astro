@@ -1,0 +1,83 @@
+---
+import MenuCard from './MenuCard.astro';
+
+interface MenuItem {
+  name: string;
+  description: string;
+  protein: string;
+  imageSrc?: string;
+  price?: number;
+  featured?: boolean;
+}
+
+interface Props {
+  items: MenuItem[];
+}
+
+const { items } = Astro.props;
+
+const proteins = ['All', 'Beef', 'Pork', 'Chicken', 'Turkey'];
+---
+
+<div class="section-padding">
+  <!-- Filter Tabs -->
+  <div id="menu-filters" class="flex flex-wrap gap-2 mb-8 justify-center">
+    {proteins.map((protein) => (
+      <button
+        class:list={[
+          'menu-filter-btn px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200',
+          protein === 'All'
+            ? 'bg-brand-gold text-brand-dark'
+            : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+        ]}
+        data-filter={protein}
+      >
+        {protein}
+      </button>
+    ))}
+  </div>
+
+  <!-- Menu Grid -->
+  <div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {items.map((item) => (
+      <div class="menu-card-wrapper" data-protein={item.protein}>
+        <MenuCard
+          name={item.name}
+          description={item.description}
+          protein={item.protein}
+          imageSrc={item.imageSrc}
+          price={item.price}
+          featured={item.featured}
+        />
+      </div>
+    ))}
+  </div>
+</div>
+
+<script>
+  const filterBtns = document.querySelectorAll<HTMLButtonElement>('.menu-filter-btn');
+  const cards = document.querySelectorAll<HTMLElement>('.menu-card-wrapper');
+
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter;
+
+      // Update active tab styles
+      filterBtns.forEach((b) => {
+        b.classList.remove('bg-brand-gold', 'text-brand-dark');
+        b.classList.add('bg-gray-200', 'text-gray-700');
+      });
+      btn.classList.remove('bg-gray-200', 'text-gray-700');
+      btn.classList.add('bg-brand-gold', 'text-brand-dark');
+
+      // Filter cards
+      cards.forEach((card) => {
+        if (filter === 'All' || card.dataset.protein === filter) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>

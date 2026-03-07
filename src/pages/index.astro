@@ -1,0 +1,98 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import Hero from '../components/Hero.astro';
+import MenuCard from '../components/MenuCard.astro';
+import TestimonialStrip from '../components/TestimonialStrip.astro';
+import InstagramFeed from '../components/InstagramFeed.astro';
+import { generateLocalBusiness } from '../utils/seo';
+
+const schema = generateLocalBusiness();
+
+const featuredSliders = [
+  {
+    name: 'Irwin M. Classic',
+    description: 'Grass-fed beef patty, grilled onions, pickle, stone ground mustard',
+    protein: 'Beef',
+    featured: true,
+    imageSrc: '/assets/imported/ig-sliders-rack.jpg',
+  },
+  {
+    name: 'The Fat Sam',
+    description: 'Four Peaks Kilt Lifter braised beef, tobacco onions, roasted garlic aioli',
+    protein: 'Beef',
+    featured: true,
+    imageSrc: '/assets/imported/ig-goldwater.jpg',
+  },
+  {
+    name: 'Arnold Babar',
+    description: 'Buttermilk fried chicken breast, pickle, spicy mayo',
+    protein: 'Chicken',
+    featured: true,
+    imageSrc: '/assets/imported/ig-food-kitsune.jpg',
+  },
+];
+---
+
+<PageLayout
+  title="Culinary JEMs | Chef-Driven Gourmet Sliders | Gilbert, AZ"
+  description="Chef-driven gourmet sliders and elevated comfort food. Pop-ups, private parties, and catering across the East Valley, AZ. Book us for your next event!"
+  schema={schema}
+>
+  <Hero />
+
+  <!-- Featured Sliders -->
+  <section class="py-16 md:py-20 bg-brand-light grain-overlay">
+    <div class="relative z-10 max-w-7xl mx-auto px-4 md:px-8 lg:px-16">
+      <div class="text-center mb-14">
+        <p class="text-brand-pink font-semibold text-sm uppercase tracking-wider mb-2">From Our Kitchen</p>
+        <h2 class="heading-lg mb-4">Fan Favorites</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          All-Fletch-themed gourmet sliders made with grass-fed beef, premium proteins, and chef-crafted sauces
+        </p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        {featuredSliders.map((slider) => (
+          <MenuCard
+            name={slider.name}
+            description={slider.description}
+            protein={slider.protein}
+            featured={slider.featured}
+            imageSrc={slider.imageSrc}
+          />
+        ))}
+      </div>
+      <div class="text-center mt-12">
+        <a href="/menu" class="btn-secondary group inline-flex items-center gap-2">
+          View Full Menu
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Catering CTA — dramatic dark section with food truck photo -->
+  <section class="relative bg-brand-dark text-white py-20 md:py-24 px-4 overflow-hidden">
+    <!-- Subtle background image of the truck -->
+    <div class="absolute inset-0 opacity-10">
+      <img src="/assets/imported/hero.jpg" alt="" class="w-full h-full object-cover" loading="lazy" aria-hidden="true" />
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-b from-brand-dark via-brand-dark/95 to-brand-dark"></div>
+    <div class="relative z-10 max-w-4xl mx-auto text-center">
+      <p class="text-brand-gold font-semibold text-sm uppercase tracking-wider mb-3">Events & Catering</p>
+      <h2 class="heading-lg mb-4">Let Us Cater Your Next Event</h2>
+      <p class="text-lg text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
+        Corporate lunches, private parties, brewery pop-ups, weddings — we bring the flavor, you enjoy the party. Serving the entire East Valley.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/catering" class="btn-pink text-lg rounded-lg pulse-pink">Get a Free Quote →</a>
+        <a href="/catering#process" class="btn-primary text-lg rounded-lg">See How It Works</a>
+      </div>
+    </div>
+  </section>
+
+  <TestimonialStrip />
+
+  <InstagramFeed />
+</PageLayout>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .card {
+      background: var(--dark);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .header {
+      padding: 56px 60px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .thanks-text {
+      font-size: 52px;
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.15;
+    }
+
+    .thanks-text .venue {
+      color: var(--gold);
+    }
+
+    .event-date {
+      font-size: 22px;
+      font-weight: 400;
+      color: rgba(250, 250, 250, 0.6);
+    }
+
+    .divider {
+      width: 80px;
+      height: 4px;
+      background: var(--gold);
+      border-radius: 2px;
+      margin-top: 8px;
+    }
+
+    /* Photo Grid */
+    .photo-grid {
+      flex: 1;
+      padding: 40px 60px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .photo-grid img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 0 60px 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .see-you {
+      font-size: 28px;
+      font-weight: 600;
+      color: rgba(250, 250, 250, 0.8);
+    }
+
+    .brand-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-bar img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+    }
+
+    .brand-bar span {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+  </style>
+</head>
+<body>
+  <div class="template-square card">
+    <!-- Header -->
+    <div class="header">
+      <h1 class="thanks-text">Thanks,<br><span class="venue">{{venue}}</span>!</h1>
+      <p class="event-date">{{date}}</p>
+      <div class="divider"></div>
+    </div>
+
+    <!-- 2x2 Photo Grid -->
+    <div class="photo-grid">
+      <img src="{{photo1}}" alt="Event photo">
+      <img src="{{photo2}}" alt="Event photo">
+      <img src="{{photo3}}" alt="Event photo">
+      <img src="{{photo4}}" alt="Event photo">
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p class="see-you">See you next time! 🤙</p>
+      <div class="brand-bar">
+        <img src="{{logoUrl}}" alt="Culinary JEMs">
+        <span>@CulinaryJEMs</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

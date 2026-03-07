@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .card {
+      background: var(--dark);
+      display: flex;
+      flex-direction: row;
+    }
+
+    /* Left: Photo */
+    .photo-side {
+      width: 45%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .photo-side img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .photo-side .photo-overlay {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 80px;
+      background: linear-gradient(to left, var(--dark), transparent);
+    }
+
+    /* Right: Text */
+    .text-side {
+      width: 55%;
+      padding: 60px 52px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 32px;
+    }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-row img {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+    }
+
+    .logo-row span {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .headline {
+      font-size: 46px;
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.15;
+    }
+
+    .headline em {
+      color: var(--gold);
+      font-style: normal;
+    }
+
+    .divider {
+      width: 64px;
+      height: 4px;
+      background: var(--gold);
+      border-radius: 2px;
+    }
+
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .bullet-list li {
+      font-size: 24px;
+      font-weight: 600;
+      color: rgba(250, 250, 250, 0.9);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .bullet-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .bullet-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 20px 40px;
+      background: var(--pink);
+      color: var(--white);
+      border-radius: 100px;
+      font-size: 22px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      text-align: center;
+      text-decoration: none;
+      width: fit-content;
+    }
+
+    .cta-url {
+      font-size: 17px;
+      color: rgba(250, 250, 250, 0.5);
+      font-weight: 400;
+      margin-top: -12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="template-square card">
+    <!-- Left: Event photo -->
+    <div class="photo-side">
+      <img src="{{photoUrl}}" alt="Culinary JEMs catering">
+      <div class="photo-overlay"></div>
+    </div>
+
+    <!-- Right: Text content -->
+    <div class="text-side">
+      <div class="logo-row">
+        <img src="{{logoUrl}}" alt="Culinary JEMs">
+        <span>Culinary JEMs</span>
+      </div>
+
+      <h1 class="headline">Book Us for<br>Your <em>Event</em></h1>
+
+      <div class="divider"></div>
+
+      <ul class="bullet-list">
+        <li>
+          <span class="bullet-icon">
+            <svg viewBox="0 0 24 24" fill="#111111"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          </span>
+          Corporate Events
+        </li>
+        <li>
+          <span class="bullet-icon">
+            <svg viewBox="0 0 24 24" fill="#111111"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          </span>
+          Private Parties
+        </li>
+        <li>
+          <span class="bullet-icon">
+            <svg viewBox="0 0 24 24" fill="#111111"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          </span>
+          Weddings & Festivals
+        </li>
+      </ul>
+
+      <div class="cta-button">Get a Free Quote</div>
+      <p class="cta-url">culinaryjems.com/catering</p>
+    </div>
+  </div>
+</body>
+</html>

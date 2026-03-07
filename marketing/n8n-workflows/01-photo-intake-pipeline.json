@@ -1,0 +1,192 @@
+{
+  "name": "CulinaryJEMs — Photo Intake Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Photo Intake Pipeline\nWhen a new photo is dropped into the \"CulinaryJEMs Photos\" Google Drive folder, this workflow:\n1. Downloads the image\n2. Sends it to OpenClaw AI to generate a caption + hashtags\n3. Adds a draft row to the Content Calendar Google Sheet\n4. Sends a Discord notification to #content-queue\n\nThe sister just needs to drop photos into Drive — everything else is automatic!",
+        "width": 480,
+        "height": 220
+      },
+      "name": "Sticky Note - Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [100, 40],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [{ "mode": "everyMinute", "value": 5 }]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "mode": "id",
+          "value": "={{$env.GDRIVE_PHOTOS_FOLDER_ID}}"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "name": "New Photo in Drive",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "position": [300, 300],
+      "typeVersion": 1,
+      "credentials": {
+        "googleDriveOAuth2Api": { "name": "Google Drive - CulinaryJEMs" }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Watching for new photos\nChecks the Google Drive 'CulinaryJEMs Photos' folder every 5 minutes for new images.",
+        "width": 280,
+        "height": 100
+      },
+      "name": "Sticky Note - Trigger",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [260, 200],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "fileId": "={{ $json.id }}",
+        "options": {
+          "fileName": "={{ $json.name }}"
+        }
+      },
+      "name": "Download Photo",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [540, 300],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": { "name": "Google Drive - CulinaryJEMs" }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{$env.OPENCLAW_JEMS_URL}}/v1/chat/completions",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"default\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Caption from Photo task.\\n\\nGenerate an Instagram caption for this photo: {{ $json.name }}.\\nPhoto type: food truck / slider / event photo.\\n\\nRespond as JSON: {\\\"caption\\\": \\\"...\\\", \\\"hashtags\\\": \\\"...\\\", \\\"suggested_pillar\\\": \\\"Menu Spotlight|BTS|Community|Schedule|Hype|Social Proof\\\", \\\"story_text\\\": \\\"...\\\"}\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"max_tokens\": 500\n}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "name": "OpenClaw - Generate Caption",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [780, 300],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": { "name": "OpenClaw API Token" }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## AI generates caption\nSends the photo info to OpenClaw AI, which writes an Instagram caption with hashtags in the Culinary JEMs brand voice.",
+        "width": 280,
+        "height": 100
+      },
+      "name": "Sticky Note - AI",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [740, 180],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  let aiResponse;\n  try {\n    const content = item.json.choices[0].message.content;\n    aiResponse = JSON.parse(content);\n  } catch (e) {\n    aiResponse = {\n      caption: item.json.choices?.[0]?.message?.content || 'Caption generation failed — please write manually',\n      hashtags: '#CulinaryJEMs #GourmetSliders #AZFoodie',\n      suggested_pillar: 'Menu Spotlight',\n      story_text: ''\n    };\n  }\n\n  const postId = 'POST-' + Date.now().toString(36).toUpperCase();\n  const now = new Date();\n  const scheduledDate = new Date(now.getTime() + 24 * 60 * 60 * 1000);\n\n  results.push({\n    json: {\n      postId,\n      status: 'draft',\n      scheduledDate: scheduledDate.toISOString().split('T')[0],\n      scheduledTime: '10:00',\n      platform: 'both',\n      contentPillar: aiResponse.suggested_pillar,\n      caption: aiResponse.caption + '\\n\\n' + aiResponse.hashtags,\n      imageUrl: item.json.webViewLink || '',\n      venue: '',\n      eventDate: '',\n      createdAt: now.toISOString(),\n      postedAt: '',\n      notes: 'Auto-generated from photo: ' + (item.json.name || 'unknown'),\n      storyText: aiResponse.story_text || ''\n    }\n  });\n}\n\nreturn results;"
+      },
+      "name": "Parse AI Response",
+      "type": "n8n-nodes-base.code",
+      "position": [1020, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "value": "={{$env.CONTENT_CALENDAR_SHEET_ID}}" },
+        "sheetName": { "value": "Content Calendar" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post ID": "={{ $json.postId }}",
+            "Status": "={{ $json.status }}",
+            "Scheduled Date": "={{ $json.scheduledDate }}",
+            "Scheduled Time": "={{ $json.scheduledTime }}",
+            "Platform": "={{ $json.platform }}",
+            "Content Pillar": "={{ $json.contentPillar }}",
+            "Caption": "={{ $json.caption }}",
+            "Image URL": "={{ $json.imageUrl }}",
+            "Venue": "={{ $json.venue }}",
+            "Event Date": "={{ $json.eventDate }}",
+            "Created At": "={{ $json.createdAt }}",
+            "Posted At": "={{ $json.postedAt }}",
+            "Notes": "={{ $json.notes }}"
+          }
+        }
+      },
+      "name": "Add to Content Calendar",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [1260, 300],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": { "name": "Google Sheets - CulinaryJEMs" }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Saves to Content Calendar\nAdds a new 'draft' row to the Google Sheet so the sister can review and approve it.",
+        "width": 280,
+        "height": 80
+      },
+      "name": "Sticky Note - Sheet",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [1220, 200],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "webhookUri": "={{$env.DISCORD_WEBHOOK_CONTENT_QUEUE}}",
+        "text": "=📸 **New draft ready for review!**\n\n**Pillar:** {{ $json.contentPillar }}\n**Scheduled:** {{ $json.scheduledDate }} at {{ $json.scheduledTime }}\n\n{{ $json.caption.substring(0, 200) }}...\n\n✏️ Review & approve in the Content Calendar sheet."
+      },
+      "name": "Discord - Notify Content Queue",
+      "type": "n8n-nodes-base.discord",
+      "position": [1500, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "## Notifies Discord\nSends a message to #content-queue so the sister knows there's a new draft to review.",
+        "width": 280,
+        "height": 80
+      },
+      "name": "Sticky Note - Discord",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [1460, 200],
+      "typeVersion": 1
+    }
+  ],
+  "connections": {
+    "New Photo in Drive": {
+      "main": [[{ "node": "Download Photo", "type": "main", "index": 0 }]]
+    },
+    "Download Photo": {
+      "main": [[{ "node": "OpenClaw - Generate Caption", "type": "main", "index": 0 }]]
+    },
+    "OpenClaw - Generate Caption": {
+      "main": [[{ "node": "Parse AI Response", "type": "main", "index": 0 }]]
+    },
+    "Parse AI Response": {
+      "main": [[{ "node": "Add to Content Calendar", "type": "main", "index": 0 }]]
+    },
+    "Add to Content Calendar": {
+      "main": [[{ "node": "Discord - Notify Content Queue", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "saveDataSuccessExecution": "all"
+  },
+  "tags": [{ "name": "culinary-jems" }, { "name": "marketing" }]
+}

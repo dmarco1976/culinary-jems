@@ -1,0 +1,144 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+---
+
+<PageLayout
+  title="About | Culinary JEMs — Chef Brian's Story"
+  description="Meet Chef Brian, the culinary mind behind Culinary JEMs. 30 years at Marriott, now serving the East Valley's best gourmet sliders from our food truck."
+>
+  <!-- Hero Section -->
+  <section class="relative bg-brand-dark text-white py-20 md:py-24 px-4 overflow-hidden">
+    <div class="absolute inset-0 opacity-10">
+      <img src="/assets/imported/ig-sliders-rack.jpg" alt="" class="w-full h-full object-cover" loading="eager" aria-hidden="true" />
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-b from-brand-dark/80 via-brand-dark/90 to-brand-dark"></div>
+    <div class="relative z-10 max-w-4xl mx-auto text-center">
+      <p class="text-brand-gold font-semibold text-sm uppercase tracking-wider mb-3 animate-fade-in-up">Our Story</p>
+      <h1 class="heading-lg mb-4 animate-fade-in-up stagger-1">The JEMs Story</h1>
+      <p class="text-xl text-gray-300 animate-fade-in-up stagger-2">Where 30 years of culinary passion meets the open road</p>
+    </div>
+  </section>
+
+  <!-- Chef Brian Bio -->
+  <section class="py-16 md:py-20 max-w-5xl mx-auto px-4 md:px-8 lg:px-16">
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      <div class="space-y-4">
+        <!-- Chef Brian placeholder with dramatic styling -->
+        <div class="relative aspect-square bg-brand-dark rounded-2xl overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-brand-gold/20 via-transparent to-brand-pink/10"></div>
+          <div class="relative z-10 flex flex-col items-center justify-center h-full p-8">
+            <img
+              src="/assets/imported/ig-logo-circle.jpg"
+              alt="Culinary JEMs logo"
+              class="h-36 w-36 rounded-full mb-5 ring-4 ring-brand-gold shadow-2xl"
+            />
+            <p class="text-brand-gold font-bold text-xl">Chef Brian</p>
+            <p class="text-gray-400 text-sm mt-1">30 Years of Culinary Excellence</p>
+            <div class="flex gap-1 mt-3">
+              {Array.from({ length: 5 }).map(() => (
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-brand-gold" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div class="aspect-video rounded-2xl overflow-hidden shadow-lg">
+          <img
+            src="/assets/imported/ig-goldwater.jpg"
+            alt="Culinary JEMs gourmet sliders with waffle fries"
+            class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+        </div>
+      </div>
+      <div>
+        <p class="text-brand-pink font-semibold text-sm uppercase tracking-wider mb-2">The Chef</p>
+        <h2 class="heading-md mb-6">Meet Chef Brian</h2>
+        <div class="space-y-4 text-gray-700 leading-relaxed">
+          <p>
+            After a distinguished 30-year career with Marriott International, Chef Brian traded the
+            hotel kitchen for something closer to his heart: bringing chef-driven food directly to
+            the people who love it.
+          </p>
+          <p>
+            Culinary JEMs was born from a simple belief — that everyone deserves restaurant-quality
+            food served with warmth and personality. Our gourmet sliders aren't just small burgers.
+            They're carefully crafted bites featuring grass-fed beef, premium proteins, house-made
+            sauces, and the kind of attention to detail that only comes from decades behind the line.
+          </p>
+          <p>
+            Every slider on our menu is named after characters from <em class="text-brand-pink">Fletch</em> — because great
+            food should never take itself too seriously. We're here to make you smile, fill your belly,
+            and maybe introduce you to your new favorite slider.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What JEMs Means -->
+  <section class="py-16 md:py-20 bg-brand-light grain-overlay">
+    <div class="relative z-10 max-w-4xl mx-auto text-center px-4">
+      <p class="text-brand-pink font-semibold text-sm uppercase tracking-wider mb-2">Behind the Name</p>
+      <h2 class="heading-md mb-6">What Does JEMs Stand For?</h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        JEMs represents the core values and family that inspired this journey. Every slider we
+        serve carries the spirit of quality, love, and dedication that defines who we are.
+      </p>
+    </div>
+  </section>
+
+  <!-- Our Promise -->
+  <section class="py-16 md:py-20 max-w-5xl mx-auto px-4 md:px-8 lg:px-16">
+    <div class="text-center mb-12">
+      <p class="text-brand-pink font-semibold text-sm uppercase tracking-wider mb-2">What We Stand For</p>
+      <h2 class="heading-md">Our Promise</h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="bg-white rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow duration-300 text-center group">
+        <div class="w-16 h-16 bg-brand-gold rounded-2xl flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform duration-300">
+          <svg class="w-8 h-8 text-brand-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h3 class="font-bold text-lg mb-2">Premium Ingredients</h3>
+        <p class="text-gray-600 text-sm leading-relaxed">Grass-fed beef, organic turkey, and locally sourced produce whenever possible.</p>
+      </div>
+      <div class="bg-white rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow duration-300 text-center group">
+        <div class="w-16 h-16 bg-brand-gold rounded-2xl flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform duration-300">
+          <svg class="w-8 h-8 text-brand-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </div>
+        <h3 class="font-bold text-lg mb-2">Made with Love</h3>
+        <p class="text-gray-600 text-sm leading-relaxed">Every slider is crafted to order with the care and precision of fine dining.</p>
+      </div>
+      <div class="bg-white rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow duration-300 text-center group">
+        <div class="w-16 h-16 bg-brand-gold rounded-2xl flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform duration-300">
+          <svg class="w-8 h-8 text-brand-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </div>
+        <h3 class="font-bold text-lg mb-2">Community First</h3>
+        <p class="text-gray-600 text-sm leading-relaxed">We show up at local breweries, markets, and events because community matters.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="relative bg-brand-dark text-white py-16 md:py-20 px-4 overflow-hidden">
+    <div class="absolute inset-0 opacity-10">
+      <img src="/assets/imported/hero.jpg" alt="" class="w-full h-full object-cover" loading="lazy" aria-hidden="true" />
+    </div>
+    <div class="absolute inset-0 bg-brand-dark/90"></div>
+    <div class="relative z-10 max-w-3xl mx-auto text-center">
+      <h2 class="heading-md mb-4">Ready to Taste the Difference?</h2>
+      <p class="text-gray-300 mb-8">Find us at our next pop-up or book us for your event.</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/schedule" class="btn-primary rounded-lg">Find Our Next Pop-Up</a>
+        <a href="/catering" class="btn-pink rounded-lg pulse-pink">Book Us for Catering</a>
+      </div>
+    </div>
+  </section>
+</PageLayout>

@@ -1,0 +1,78 @@
+---
+interface Props {
+  title: string;
+  text: string;
+  url: string;
+}
+
+const { title, text, url } = Astro.props;
+---
+
+<div class="share-button-wrapper inline-block relative" data-title={title} data-text={text} data-url={url}>
+  <button
+    class="share-btn inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-brand-pink transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-gray-100"
+    aria-label="Share this page"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+    </svg>
+    <span>Share</span>
+  </button>
+
+  <!-- Toast notification -->
+  <div
+    class="share-toast fixed bottom-6 left-1/2 -translate-x-1/2 bg-brand-dark text-white text-sm font-semibold px-5 py-3 rounded-full shadow-lg z-50 opacity-0 pointer-events-none transition-opacity duration-300"
+  >
+    Link copied to clipboard!
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLDivElement>('.share-button-wrapper').forEach((wrapper) => {
+    const btn = wrapper.querySelector('.share-btn') as HTMLButtonElement;
+    const toast = wrapper.querySelector('.share-toast') as HTMLDivElement;
+    const shareTitle = wrapper.dataset.title || '';
+    const shareText = wrapper.dataset.text || '';
+    const shareUrl = wrapper.dataset.url || window.location.href;
+
+    function showToast() {
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 2500);
+    }
+
+    btn.addEventListener('click', async () => {
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: shareTitle,
+            text: shareText,
+            url: shareUrl,
+          });
+        } catch (err) {
+          // User cancelled or share failed — ignore
+        }
+      } else {
+        // Fallback: copy to clipboard
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          showToast();
+        } catch {
+          // Older browser fallback
+          const textarea = document.createElement('textarea');
+          textarea.value = shareUrl;
+          textarea.style.position = 'fixed';
+          textarea.style.opacity = '0';
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textarea);
+          showToast();
+        }
+      }
+    });
+  });
+</script>

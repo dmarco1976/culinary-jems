@@ -1,0 +1,95 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import MenuGrid from '../components/MenuGrid.astro';
+import { generateMenuItems } from '../utils/seo';
+
+const menuItems = [
+  {
+    name: 'Irwin M. Classic',
+    description: 'Grass-fed beef patty, grilled onions, pickle, stone ground mustard',
+    protein: 'Beef',
+    featured: true,
+    displayOrder: 1,
+    imageSrc: '/assets/imported/ig-sliders-rack.jpg',
+  },
+  {
+    name: "I'm A Shepherd",
+    description: 'Grass-fed beef patty, aged cheddar, boursin, provolone',
+    protein: 'Beef',
+    featured: false,
+    displayOrder: 2,
+    imageSrc: '/assets/imported/slider-closeup.jpg',
+  },
+  {
+    name: 'The Fat Sam',
+    description: 'Four Peaks Kilt Lifter braised beef, tobacco onions, roasted garlic aioli',
+    protein: 'Beef',
+    featured: true,
+    displayOrder: 3,
+    imageSrc: '/assets/imported/ig-goldwater.jpg',
+  },
+  {
+    name: 'Chief Karlen',
+    description: 'Pork tenderloin, grilled onions, havarti, arugula, lemon aioli',
+    protein: 'Pork',
+    featured: false,
+    displayOrder: 4,
+    imageSrc: '/assets/imported/slider-closeup.jpg',
+  },
+  {
+    name: 'Arnold Babar',
+    description: 'Buttermilk fried chicken breast, pickle, spicy mayo',
+    protein: 'Chicken',
+    featured: true,
+    displayOrder: 5,
+    imageSrc: '/assets/imported/ig-food-kitsune.jpg',
+  },
+  {
+    name: 'Dr. Rosenrose',
+    description: 'Organic turkey meatball, marinara, arugula, pecorino romano',
+    protein: 'Turkey',
+    featured: false,
+    displayOrder: 6,
+    imageSrc: '/assets/imported/ig-food-carousel.jpg',
+  },
+];
+
+const menuSchema = generateMenuItems(
+  menuItems.map((item) => ({
+    name: item.name,
+    description: item.description,
+  }))
+);
+---
+
+<PageLayout
+  title="Menu | Culinary JEMs — Gourmet Sliders"
+  description="Explore our chef-crafted gourmet slider menu. Grass-fed beef, premium pork, buttermilk chicken, and organic turkey — all Fletch-themed and made to order."
+  schema={menuSchema}
+>
+  <section class="py-16 md:py-20 max-w-7xl mx-auto px-4 md:px-8 lg:px-16">
+    <div class="text-center mb-14">
+      <p class="text-brand-pink font-semibold text-sm uppercase tracking-wider mb-2">Chef-Crafted</p>
+      <h1 class="heading-lg mb-4">Our Menu</h1>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        Every slider tells a story. All-Fletch-themed gourmet sliders made with grass-fed beef, premium proteins, and house-made sauces.
+      </p>
+      <p class="text-sm text-gray-500 mt-2">
+        Menu items may vary by event. Follow us on Instagram for daily specials!
+      </p>
+    </div>
+
+    <MenuGrid items={menuItems} />
+  </section>
+
+  <!-- Catering CTA -->
+  <section class="bg-brand-gold py-16 px-4">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="heading-md text-brand-dark mb-4">Want Sliders at Your Event?</h2>
+      <p class="text-brand-dark/80 mb-6">
+        We build custom menus for corporate lunches, private parties, weddings, and more.
+      </p>
+      <a href="/catering" class="btn-secondary">Get a Free Catering Quote →</a>
+    </div>
+  </section>
+</PageLayout>

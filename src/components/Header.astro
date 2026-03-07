@@ -1,0 +1,115 @@
+---
+const navLinks = [
+  { label: 'Menu', href: '/menu' },
+  { label: 'Catering', href: '/catering' },
+  { label: 'Schedule', href: '/schedule' },
+  { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
+];
+---
+
+<header id="site-header" class="sticky top-0 z-50 bg-white transition-shadow duration-300">
+  <div class="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between h-16 md:h-20">
+    <!-- Logo -->
+    <a href="/" class="flex items-center gap-2 shrink-0">
+      <img
+        src="/assets/imported/ig-logo-circle.jpg"
+        alt="Culinary JEMs - Gourmet Sliders"
+        class="h-12 md:h-14 w-auto rounded-full"
+      />
+    </a>
+
+    <!-- Desktop Nav -->
+    <nav class="hidden md:flex items-center gap-6 lg:gap-8">
+      {navLinks.map((link) => (
+        <a
+          href={link.href}
+          class="text-sm font-semibold text-brand-dark hover:text-brand-pink transition-colors duration-200"
+        >
+          {link.label}
+        </a>
+      ))}
+      <a href="/catering" class="btn-pink rounded-full text-sm px-5 py-2 pulse-pink">
+        Book Us
+      </a>
+    </nav>
+
+    <!-- Mobile Hamburger Button -->
+    <button
+      id="mobile-menu-btn"
+      class="md:hidden flex flex-col items-center justify-center w-10 h-10 gap-1.5"
+      aria-label="Open menu"
+      aria-expanded="false"
+    >
+      <span class="hamburger-line block w-6 h-0.5 bg-brand-dark transition-all duration-300"></span>
+      <span class="hamburger-line block w-6 h-0.5 bg-brand-dark transition-all duration-300"></span>
+      <span class="hamburger-line block w-6 h-0.5 bg-brand-dark transition-all duration-300"></span>
+    </button>
+  </div>
+
+  <!-- Mobile Menu Overlay -->
+  <div
+    id="mobile-menu"
+    class="fixed inset-0 z-40 bg-brand-gold flex flex-col items-center justify-center gap-8 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden"
+  >
+    <button
+      id="mobile-menu-close"
+      class="absolute top-5 right-5 w-10 h-10 flex items-center justify-center text-brand-dark"
+      aria-label="Close menu"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    {navLinks.map((link) => (
+      <a
+        href={link.href}
+        class="text-2xl font-bold text-brand-dark hover:text-brand-pink transition-colors duration-200"
+      >
+        {link.label}
+      </a>
+    ))}
+    <a href="/catering" class="btn-pink rounded-full text-lg px-8 py-3 mt-4">
+      Book Us
+    </a>
+  </div>
+</header>
+
+<script>
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  const menuClose = document.getElementById('mobile-menu-close');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const header = document.getElementById('site-header');
+
+  function openMenu() {
+    mobileMenu?.classList.remove('translate-x-full');
+    mobileMenu?.classList.add('translate-x-0');
+    menuBtn?.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMenu() {
+    mobileMenu?.classList.remove('translate-x-0');
+    mobileMenu?.classList.add('translate-x-full');
+    menuBtn?.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+
+  menuBtn?.addEventListener('click', openMenu);
+  menuClose?.addEventListener('click', closeMenu);
+
+  // Close menu when clicking a nav link
+  mobileMenu?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', closeMenu);
+  });
+
+  // Sticky header shadow on scroll
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 10) {
+      header?.classList.add('shadow-md');
+    } else {
+      header?.classList.remove('shadow-md');
+    }
+  });
+</script>

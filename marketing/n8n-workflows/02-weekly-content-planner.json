@@ -1,0 +1,199 @@
+{
+  "name": "CulinaryJEMs — Weekly Content Planner",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Weekly Content Planner\nEvery Sunday at 8 AM (MST), this workflow:\n1. Checks the Content Calendar for approved posts already scheduled for next week\n2. Asks OpenClaw AI to fill in the missing days with content ideas\n3. Adds draft rows for each generated post\n4. Sends a Discord message to #approvals so the sister can review the week\n\nThe sister spends ~5 min on Sunday reviewing and approving. That's it!",
+        "width": 500,
+        "height": 200
+      },
+      "name": "Sticky Note - Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [100, 40],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * 0"
+            }
+          ]
+        }
+      },
+      "name": "Sunday 8 AM MST",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [300, 300],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "content": "## Runs every Sunday morning\nStarts the weekly content planning process at 8 AM Arizona time.",
+        "width": 260,
+        "height": 80
+      },
+      "name": "Sticky Note - Trigger",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [260, 200],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "value": "={{$env.CONTENT_CALENDAR_SHEET_ID}}" },
+        "sheetName": { "value": "Content Calendar" },
+        "options": {
+          "range": "A:M"
+        }
+      },
+      "name": "Read Current Calendar",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [540, 300],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": { "name": "Google Sheets - CulinaryJEMs" }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const items = $input.all();\nconst now = new Date();\n\n// Calculate next week's date range (Mon-Sun)\nconst dayOfWeek = now.getDay();\nconst daysUntilMonday = dayOfWeek === 0 ? 1 : 8 - dayOfWeek;\nconst nextMonday = new Date(now.getTime() + daysUntilMonday * 86400000);\n\nconst weekDates = [];\nfor (let i = 0; i < 7; i++) {\n  const d = new Date(nextMonday.getTime() + i * 86400000);\n  weekDates.push(d.toISOString().split('T')[0]);\n}\n\n// Find which days already have posts\nconst existingDates = new Set();\nfor (const item of items) {\n  const date = item.json['Scheduled Date'];\n  const status = item.json['Status'];\n  if (date && (status === 'approved' || status === 'draft')) {\n    existingDates.add(date);\n  }\n}\n\nconst missingDays = weekDates.filter(d => !existingDates.has(d));\n\n// Get recent posts to avoid repetition\nconst recentCaptions = items\n  .filter(i => i.json['Status'] === 'posted')\n  .slice(-5)\n  .map(i => i.json['Content Pillar'])\n  .join(', ');\n\nreturn [{\n  json: {\n    weekStart: weekDates[0],\n    weekEnd: weekDates[6],\n    missingDays: missingDays,\n    missingCount: missingDays.length,\n    existingCount: 7 - missingDays.length,\n    recentPillars: recentCaptions,\n    weekDates: weekDates\n  }\n}];"
+      },
+      "name": "Find Missing Days",
+      "type": "n8n-nodes-base.code",
+      "position": [780, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.missingCount }}",
+              "rightValue": 0,
+              "operator": { "type": "number", "operation": "gt" }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "name": "Any Missing Days?",
+      "type": "n8n-nodes-base.if",
+      "position": [1000, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "url": "={{$env.OPENCLAW_JEMS_URL}}/v1/chat/completions",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"default\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Weekly Content Plan task.\\n\\nCreate content for these dates: {{ $json.missingDays.join(', ') }}\\n\\nRecent pillars used (avoid repeating): {{ $json.recentPillars }}\\nThis week's date range: {{ $json.weekStart }} to {{ $json.weekEnd }}\\n\\nFor each date, respond in JSON array format:\\n[{\\\"date\\\": \\\"YYYY-MM-DD\\\", \\\"pillar\\\": \\\"...\\\", \\\"caption\\\": \\\"full caption with hashtags\\\", \\\"scheduledTime\\\": \\\"HH:MM\\\", \\\"platform\\\": \\\"both\\\", \\\"needsFreshPhoto\\\": true/false, \\\"suggestedImage\\\": \\\"description\\\"}]\"\n    }\n  ],\n  \"temperature\": 0.8,\n  \"max_tokens\": 2000\n}",
+        "options": { "timeout": 60000 }
+      },
+      "name": "OpenClaw - Generate Week Plan",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1240, 240],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": { "name": "OpenClaw API Token" }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## AI fills in the gaps\nOpenClaw creates content for any days that don't already have posts, following the weekly content pillar rotation.",
+        "width": 280,
+        "height": 80
+      },
+      "name": "Sticky Note - AI",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [1200, 140],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  let posts;\n  try {\n    const content = item.json.choices[0].message.content;\n    // Handle markdown code blocks\n    const cleaned = content.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n    posts = JSON.parse(cleaned);\n  } catch (e) {\n    // If parsing fails, create a single placeholder\n    posts = [{ date: new Date().toISOString().split('T')[0], pillar: 'Menu Spotlight', caption: 'Content generation failed — please write manually', scheduledTime: '10:00', platform: 'both' }];\n  }\n\n  for (const post of posts) {\n    const postId = 'POST-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 5).toUpperCase();\n    results.push({\n      json: {\n        'Post ID': postId,\n        'Status': 'draft',\n        'Scheduled Date': post.date,\n        'Scheduled Time': post.scheduledTime || '10:00',\n        'Platform': post.platform || 'both',\n        'Content Pillar': post.pillar,\n        'Caption': post.caption,\n        'Image URL': '',\n        'Venue': '',\n        'Event Date': '',\n        'Created At': new Date().toISOString(),\n        'Posted At': '',\n        'Notes': 'Auto-generated by Weekly Planner. ' + (post.needsFreshPhoto ? 'NEEDS FRESH PHOTO: ' + (post.suggestedImage || '') : 'Can use library photo')\n      }\n    });\n  }\n}\n\nreturn results;"
+      },
+      "name": "Parse Posts",
+      "type": "n8n-nodes-base.code",
+      "position": [1480, 240],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "value": "={{$env.CONTENT_CALENDAR_SHEET_ID}}" },
+        "sheetName": { "value": "Content Calendar" },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        }
+      },
+      "name": "Add Drafts to Calendar",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [1720, 240],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": { "name": "Google Sheets - CulinaryJEMs" }
+      }
+    },
+    {
+      "parameters": {
+        "webhookUri": "={{$env.DISCORD_WEBHOOK_APPROVALS}}",
+        "text": "=📅 **Your content plan for next week is ready!**\n\nWeek of {{ $json['Scheduled Date'] }}\n\nI've added {{ $input.all().length }} new draft posts to the Content Calendar.\n\n✅ **What to do:** Open the Google Sheet, review the captions, and change status to 'approved' for the ones you like.\n\n📝 Edit any captions you want to tweak — they're just drafts!\n\n🔗 Content Calendar: {{$env.CONTENT_CALENDAR_URL}}"
+      },
+      "name": "Discord - Notify Approvals",
+      "type": "n8n-nodes-base.discord",
+      "position": [1960, 240],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "webhookUri": "={{$env.DISCORD_WEBHOOK_APPROVALS}}",
+        "text": "=📅 **Content plan for next week: All set!**\n\nAll 7 days already have approved or draft posts. No new content needed this week. 🎉\n\n🔗 Review: {{$env.CONTENT_CALENDAR_URL}}"
+      },
+      "name": "Discord - Already Full",
+      "type": "n8n-nodes-base.discord",
+      "position": [1240, 420],
+      "typeVersion": 2
+    }
+  ],
+  "connections": {
+    "Sunday 8 AM MST": {
+      "main": [[{ "node": "Read Current Calendar", "type": "main", "index": 0 }]]
+    },
+    "Read Current Calendar": {
+      "main": [[{ "node": "Find Missing Days", "type": "main", "index": 0 }]]
+    },
+    "Find Missing Days": {
+      "main": [[{ "node": "Any Missing Days?", "type": "main", "index": 0 }]]
+    },
+    "Any Missing Days?": {
+      "main": [
+        [{ "node": "OpenClaw - Generate Week Plan", "type": "main", "index": 0 }],
+        [{ "node": "Discord - Already Full", "type": "main", "index": 0 }]
+      ]
+    },
+    "OpenClaw - Generate Week Plan": {
+      "main": [[{ "node": "Parse Posts", "type": "main", "index": 0 }]]
+    },
+    "Parse Posts": {
+      "main": [[{ "node": "Add Drafts to Calendar", "type": "main", "index": 0 }]]
+    },
+    "Add Drafts to Calendar": {
+      "main": [[{ "node": "Discord - Notify Approvals", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "timezone": "America/Phoenix"
+  },
+  "tags": [{ "name": "culinary-jems" }, { "name": "marketing" }]
+}

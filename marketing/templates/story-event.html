@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .story {
+      background: var(--dark);
+    }
+
+    /* Background photo with overlay */
+    .bg-photo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.25;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(17, 17, 17, 0.6) 0%,
+        rgba(17, 17, 17, 0.3) 30%,
+        rgba(17, 17, 17, 0.3) 60%,
+        rgba(17, 17, 17, 0.85) 100%
+      );
+    }
+
+    .content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 80px 60px;
+    }
+
+    /* Top section */
+    .top-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      margin-top: 60px;
+    }
+
+    .headline-badge {
+      background: var(--gold);
+      color: var(--dark);
+      padding: 20px 48px;
+      border-radius: 8px;
+      font-size: 52px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      text-align: center;
+    }
+
+    .logo {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+    }
+
+    /* Center section */
+    .center-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      text-align: center;
+    }
+
+    .venue-name {
+      font-size: 72px;
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.1;
+      text-align: center;
+    }
+
+    .event-time {
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--gold);
+      text-align: center;
+    }
+
+    .event-address {
+      font-size: 28px;
+      font-weight: 400;
+      color: rgba(250, 250, 250, 0.7);
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .divider {
+      width: 120px;
+      height: 4px;
+      background: var(--gold);
+      border-radius: 2px;
+    }
+
+    /* Food photo strip */
+    .photo-strip {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      height: 280px;
+      margin-top: auto;
+    }
+
+    .photo-strip img {
+      flex: 1;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+
+    /* Swipe CTA */
+    .swipe-cta {
+      margin-top: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .swipe-cta .arrow {
+      width: 32px;
+      height: 32px;
+      animation: bounce 1.5s infinite;
+    }
+
+    .swipe-cta span {
+      font-size: 18px;
+      font-weight: 600;
+      color: rgba(250, 250, 250, 0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="template-story story">
+    <!-- Background photo (optional) -->
+    <img class="bg-photo" src="{{bgPhotoUrl}}" alt="">
+    <div class="overlay"></div>
+
+    <div class="content">
+      <!-- Top: Headline + Logo -->
+      <div class="top-section">
+        <div class="headline-badge">{{headline}}</div>
+        <img class="logo" src="{{logoUrl}}" alt="Culinary JEMs">
+      </div>
+
+      <!-- Center: Venue + Time -->
+      <div class="center-section">
+        <h1 class="venue-name">{{venue}}</h1>
+        <div class="divider"></div>
+        <p class="event-time">{{time}}</p>
+        <p class="event-address">{{address}}</p>
+      </div>
+
+      <!-- Bottom: Photo strip -->
+      <div class="photo-strip">
+        <img src="{{photo1}}" alt="Food">
+        <img src="{{photo2}}" alt="Food">
+        <img src="{{photo3}}" alt="Food">
+      </div>
+
+      <!-- Swipe CTA -->
+      <div class="swipe-cta">
+        <svg class="arrow" viewBox="0 0 24 24" fill="rgba(250,250,250,0.6)">
+          <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
+        </svg>
+        <span>Swipe up for menu</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

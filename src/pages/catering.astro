@@ -1,0 +1,173 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import CateringProcess from '../components/CateringProcess.astro';
+import EventTypeCards from '../components/EventTypeCards.astro';
+import CateringForm from '../components/CateringForm.astro';
+import FAQAccordion from '../components/FAQAccordion.astro';
+import PhotoGallery from '../components/PhotoGallery.astro';
+
+const faqItems = [
+  {
+    question: 'How much does catering cost?',
+    answer: 'Our catering packages start based on headcount and menu selection. We offer custom quotes for every event. Generally, expect per-person pricing that includes setup, service, and cleanup. Contact us for a free quote tailored to your event.',
+  },
+  {
+    question: 'What is your service area?',
+    answer: 'We serve the entire East Valley including Gilbert, Mesa, Chandler, Tempe, Scottsdale, and surrounding areas. For events outside this area, reach out and we\'ll do our best to accommodate.',
+  },
+  {
+    question: 'What\'s included in a catering package?',
+    answer: 'Every catering package includes our chef-crafted gourmet sliders, setup, service staff, all necessary equipment, and cleanup. We bring everything — you just need a flat surface for us to set up and a power outlet.',
+  },
+  {
+    question: 'Is there a minimum headcount?',
+    answer: 'Our minimum is typically 25 guests for catered events. For smaller gatherings, we may be able to accommodate depending on the date and location. Just ask!',
+  },
+  {
+    question: 'How far in advance should I book?',
+    answer: 'We recommend booking at least 2-3 weeks in advance for most events. For large events (100+ guests) or peak season dates, 4-6 weeks is ideal. That said, we always try to accommodate last-minute requests when possible.',
+  },
+  {
+    question: 'Can you accommodate dietary restrictions?',
+    answer: 'Yes! Our menu includes beef, pork, chicken, and turkey options. We can work with you to create a menu that fits your group\'s needs. Let us know about any allergies or restrictions when you request your quote.',
+  },
+];
+
+const galleryPhotos = [
+  { src: '/assets/imported/ig-sliders-rack.jpg', alt: 'Gourmet sliders fresh off the grill', caption: 'Fresh off the grill' },
+  { src: '/assets/imported/ig-goldwater.jpg', alt: 'Sliders and waffle fries at Goldwater Brewing', caption: 'Brewery pop-up with waffle fries' },
+  { src: '/assets/imported/ig-food-kitsune.jpg', alt: 'Fried chicken sliders at Kitsune Brewing', caption: 'Arnold Babar — buttermilk fried chicken' },
+  { src: '/assets/imported/ig-food-carousel.jpg', alt: 'Turkey meatball sliders with marinara', caption: 'Dr. Rosenrose — turkey meatball sliders' },
+  { src: '/assets/imported/hero.jpg', alt: 'Culinary JEMs food truck at an event', caption: 'The truck at a local event' },
+  { src: '/assets/imported/yelp-photo.jpg', alt: 'Culinary JEMs slider spread', caption: 'Ready to serve' },
+];
+---
+
+<PageLayout
+  title="Catering | Culinary JEMs — Book Our Food Truck for Your Event"
+  description="Book Culinary JEMs gourmet slider food truck for your next event. Corporate lunches, private parties, weddings, brewery events. Free quotes, East Valley AZ."
+>
+  <!-- Hero — with background texture -->
+  <section class="relative bg-brand-dark text-white py-20 md:py-24 px-4 overflow-hidden">
+    <div class="absolute inset-0 opacity-10">
+      <img src="/assets/imported/hero.jpg" alt="" class="w-full h-full object-cover" loading="eager" aria-hidden="true" />
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-b from-brand-dark/80 via-brand-dark/90 to-brand-dark"></div>
+    <div class="relative z-10 max-w-4xl mx-auto text-center">
+      <p class="text-brand-gold font-semibold mb-3 uppercase tracking-wider text-sm animate-fade-in-up">Catering & Events</p>
+      <h1 class="heading-lg mb-6 animate-fade-in-up stagger-1">We Bring the Flavor. You Enjoy the Party.</h1>
+      <p class="text-xl text-gray-300 max-w-2xl mx-auto mb-5 animate-fade-in-up stagger-2">
+        Trusted for corporate lunches, brewery events, and private celebrations across the East Valley.
+      </p>
+      <div class="flex items-center justify-center gap-4 text-gray-400 text-sm mb-8 animate-fade-in-up stagger-2">
+        <div class="flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <span>4.0 on Yelp</span>
+        </div>
+        <span class="w-1 h-1 bg-gray-500 rounded-full"></span>
+        <span>241 reviews</span>
+        <span class="w-1 h-1 bg-gray-500 rounded-full"></span>
+        <span>Gilbert, AZ</span>
+      </div>
+      <div class="animate-fade-in-up stagger-3">
+        <a href="#quote" class="btn-pink text-lg rounded-lg pulse-pink">Get a Free Quote →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3-Step Process -->
+  <section id="process" class="py-16 md:py-20 bg-brand-light grain-overlay">
+    <div class="relative z-10 max-w-7xl mx-auto px-4 md:px-8 lg:px-16">
+      <div class="text-center mb-14">
+        <p class="text-brand-pink font-semibold text-sm uppercase tracking-wider mb-2">Simple as 1-2-3</p>
+        <h2 class="heading-md mb-4">How It Works</h2>
+        <p class="text-gray-600 max-w-xl mx-auto">Three simple steps to gourmet sliders at your next event</p>
+      </div>
+      <CateringProcess />
+    </div>
+  </section>
+
+  <!-- Event Types — now with photo-backed cards -->
+  <section class="py-16 md:py-20">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 lg:px-16">
+      <div class="text-center mb-12">
+        <p class="text-brand-pink font-semibold text-sm uppercase tracking-wider mb-2">We Do It All</p>
+        <h2 class="heading-md mb-4">Perfect For Any Event</h2>
+        <p class="text-gray-600 max-w-xl mx-auto">From corporate lunches to backyard celebrations, we've got you covered</p>
+      </div>
+      <EventTypeCards />
+    </div>
+  </section>
+
+  <!-- Photo Gallery -->
+  <section class="py-16 md:py-20 bg-brand-light grain-overlay">
+    <div class="relative z-10 max-w-7xl mx-auto px-4 md:px-8 lg:px-16">
+      <div class="text-center mb-12">
+        <p class="text-brand-pink font-semibold text-sm uppercase tracking-wider mb-2">See Our Work</p>
+        <h2 class="heading-md mb-4">Past Events</h2>
+        <p class="text-gray-600 max-w-xl mx-auto">A taste of what we bring to the table</p>
+      </div>
+    </div>
+    <PhotoGallery photos={galleryPhotos} />
+  </section>
+
+  <!-- Lead Form -->
+  <section id="quote" class="py-16 md:py-20">
+    <div class="max-w-2xl mx-auto px-4 md:px-8">
+      <div class="text-center mb-10">
+        <p class="text-brand-pink font-semibold text-sm uppercase tracking-wider mb-2">Free & No Obligation</p>
+        <h2 class="heading-md mb-4">Get Your Free Quote</h2>
+        <p class="text-gray-600">Tell us about your event and we'll put together a custom package. Most quotes returned within 24 hours.</p>
+      </div>
+      <CateringForm />
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="py-16 md:py-20 bg-brand-light grain-overlay">
+    <div class="relative z-10 max-w-3xl mx-auto px-4 md:px-8">
+      <div class="text-center mb-10">
+        <p class="text-brand-pink font-semibold text-sm uppercase tracking-wider mb-2">Got Questions?</p>
+        <h2 class="heading-md mb-4">Frequently Asked Questions</h2>
+      </div>
+      <FAQAccordion items={faqItems} />
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="relative bg-brand-gold py-16 md:py-20 px-4 grain-overlay overflow-hidden">
+    <div class="relative z-10 max-w-3xl mx-auto text-center">
+      <h2 class="heading-md text-brand-dark mb-4">Ready to Get Started?</h2>
+      <p class="text-brand-dark/80 mb-8 text-lg">
+        Your guests will thank you. Let's make your next event deliciously memorable.
+      </p>
+      <a href="#quote" class="btn-secondary text-lg">Get a Free Quote →</a>
+    </div>
+  </section>
+
+  <!-- Sticky Mobile CTA -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 p-3 md:hidden z-40 shadow-lg" id="sticky-cta">
+    <a href="#quote" class="btn-pink w-full block text-center text-lg rounded-lg">
+      Get Your Free Quote →
+    </a>
+  </div>
+</PageLayout>
+
+<script>
+  // Hide sticky CTA when quote form is visible
+  const stickyCta = document.getElementById('sticky-cta');
+  const quoteSection = document.getElementById('quote');
+
+  if (stickyCta && quoteSection) {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        stickyCta.style.transform = entry.isIntersecting ? 'translateY(100%)' : 'translateY(0)';
+        stickyCta.style.transition = 'transform 0.3s ease';
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(quoteSection);
+  }
+</script>

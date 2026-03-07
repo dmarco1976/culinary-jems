@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .card {
+      background: var(--dark);
+    }
+
+    .food-photo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 55%;
+      background: linear-gradient(
+        to top,
+        rgba(17, 17, 17, 0.97) 0%,
+        rgba(17, 17, 17, 0.85) 40%,
+        rgba(17, 17, 17, 0.4) 70%,
+        transparent 100%
+      );
+    }
+
+    .content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .protein-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 24px;
+      border-radius: 100px;
+      background: var(--gold);
+      color: var(--dark);
+      font-size: 18px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      width: fit-content;
+    }
+
+    .protein-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--dark);
+    }
+
+    .slider-name {
+      font-size: 56px;
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.1;
+    }
+
+    .slider-description {
+      font-size: 26px;
+      color: rgba(250, 250, 250, 0.85);
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    .divider-gold {
+      width: 80px;
+      height: 4px;
+      background: var(--gold);
+      border-radius: 2px;
+    }
+
+    .menu-cta {
+      font-size: 20px;
+      color: var(--gold);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 8px;
+    }
+
+    .logo-watermark {
+      position: absolute;
+      top: 32px;
+      right: 32px;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      opacity: 0.85;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="template-square card">
+    <!-- Full-bleed food photo -->
+    <img class="food-photo" src="{{photoUrl}}" alt="{{name}}">
+
+    <!-- Gradient overlay -->
+    <div class="overlay"></div>
+
+    <!-- Logo watermark -->
+    <img class="logo-watermark" src="{{logoUrl}}" alt="Culinary JEMs">
+
+    <!-- Content -->
+    <div class="content">
+      <div class="protein-badge">
+        <span class="protein-dot"></span>
+        {{protein}}
+      </div>
+
+      <h1 class="slider-name">{{name}}</h1>
+
+      <div class="divider-gold"></div>
+
+      <p class="slider-description">{{description}}</p>
+
+      <p class="menu-cta">Full menu → culinaryjems.com/menu</p>
+    </div>
+  </div>
+</body>
+</html>
