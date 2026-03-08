@@ -120,4 +120,13 @@
   .pulse-pink {
     animation: gentlePulse 2.5s ease-in-out infinite;
   }
+
+  /* Subtle slow zoom — Ken Burns feel on a still photo */
+  @keyframes slowZoom {
+    from { transform: scale(1); }
+    to { transform: scale(1.08); }
+  }
+  .slow-zoom {
+    animation: slowZoom 15s ease-out forwards;
+  }
 }
